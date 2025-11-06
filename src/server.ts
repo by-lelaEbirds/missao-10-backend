@@ -1,11 +1,12 @@
 // =============================================================================
-// ARQUIVO ÚNICO DA API - VERSÃO FINAL CORRIGIDA
+// ARQUIVO ÚNICO DA API - VERSÃO FINAL CORRIGIDA E COM CORS
 // =============================================================================
 
 import express, { Request, Response, NextFunction, ErrorRequestHandler, Router } from 'express';
 import { z, AnyZodObject } from 'zod';
 import Airtable from 'airtable';
 import dotenv from 'dotenv';
+import cors from 'cors'; // <--- 1. IMPORTAMOS A FERRAMENTA CORS
 
 // =============================================================================
 // 1. CONFIGURAÇÃO INICIAL
@@ -14,6 +15,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors()); // <--- 2. ATIVAMOS O CORS (DESTRANCAMOS A PORTA)
 
 const airtable = new Airtable({
     apiKey: process.env.AIRTABLE_API_KEY,
@@ -157,14 +159,12 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 // =============================================================================
 const productRoutes = Router();
 
-// ### A CORREÇÃO ESTÁ AQUI! ESTA PARTE ESTAVA FALTANDO ###
 productRoutes.post('/', validate(createProductSchema), productController.create);
 productRoutes.get('/', productController.findAll);
 productRoutes.get('/:id', productController.findById);
 productRoutes.put('/:id', validate(updateProductSchema), productController.update);
 productRoutes.patch('/:id', validate(updateProductSchema), productController.update);
 productRoutes.delete('/:id', productController.delete);
-// ### FIM DA CORREÇÃO ###
 
 // ROTA DA PÁGINA INICIAL
 app.get('/', (req, res) => res.send('API Mestre dos Dados - Missão 8 - FUNCIONANDO!'));
